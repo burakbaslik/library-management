@@ -113,6 +113,3 @@ The application initializes with a default Admin user for testing purposes.
 | POST | `/books` | Add a new book | Admin |
 | GET | `/auth/users` | List all users | Admin |
 
-## 📄 License
-
-[MIT](https://choosealicense.com/licenses/mit/)
