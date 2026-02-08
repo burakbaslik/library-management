@@ -34,9 +34,11 @@ The Library Management System is designed to streamline the operations of a libr
 ## 📸 Screenshots
 
 ### Start Page (Index)
+<img width="1591" height="730" alt="image" src="https://github.com/user-attachments/assets/766ae412-2d43-41af-aa68-96b1edc73ecc" />
 
 
 ### Dashboard
+![dashboard](https://github.com/user-attachments/assets/93911ad1-256e-4afa-9eec-130a338502a5)
 
 
 ## 🛠 Technologies Used
