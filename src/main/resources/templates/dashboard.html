@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Panel | Kütüphane</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gradient: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-light: #423939;
+            --text-dark: #333;
+            --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-strong: 0 10px 15px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1);
+            --bg-grid-svg: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M0 0h3v3H0V0zm3 3h3v3H3V3z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            padding-top: 56px;
+            background: var(--primary-gradient);
+            color: var(--text-light);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            background-attachment: fixed;
+            background-image: var(--bg-grid-svg), var(--primary-gradient);
+        }
+
+        /* Floating Shapes */
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .floating-shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            animation: float 10s infinite ease-in-out alternate;
+        }
+
+        .floating-shape:nth-child(1) { width: 150px; height: 150px; top: 10%; left: 5%; animation-duration: 12s; }
+        .floating-shape:nth-child(2) { width: 200px; height: 200px; top: 50%; right: 10%; animation-duration: 15s; }
+        .floating-shape:nth-child(3) { width: 100px; height: 100px; bottom: 5%; left: 30%; animation-duration: 10s; }
+        .floating-shape:nth-child(4) { width: 180px; height: 180px; top: 20%; right: 40%; animation-duration: 13s; }
+        .floating-shape:nth-child(5) { width: 120px; height: 120px; bottom: 20%; left: 15%; animation-duration: 11s; }
+
+        @keyframes float {
+            0% { transform: translateY(0px) translateX(0px) scale(1); opacity: 0.05; }
+            50% { transform: translateY(20px) translateX(10px) scale(1.05); opacity: 0.08; }
+            100% { transform: translateY(0px) translateX(0px) scale(1); opacity: 0.05; }
+        }
+
+        .navbar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+        }
+        .navbar-brand {
+            color: var(--text-light) !important;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.5rem;
+            text-shadow: var(--shadow-soft);
+        }
+
+        .btn-outline-light {
+            color: var(--text-light);
+            border-color: var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        .btn-outline-light:hover {
+            color: #fff;
+            background: var(--secondary-gradient);
+            border-color: transparent;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .sidebar {
+            min-height: calc(100vh - 56px);
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--glass-border);
+            padding-top: 2rem !important;
+            box-shadow: var(--shadow-soft);
+        }
+        .sidebar .nav-link {
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+        }
+        .sidebar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft);
+        }
+        .sidebar .nav-link.active {
+            background: var(--secondary-gradient);
+            color: #fff;
+            font-weight: 600;
+            border-color: transparent;
+            box-shadow: var(--shadow-strong);
+        }
+        .sidebar .nav-link .fas {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        #currentUser {
+            color: #fff;
+            font-weight: 600;
+            background: var(--glass-bg);
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+        }
+        .small.text-muted {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+
+        main {
+            background: rgba(0, 0, 0, 0.1); /* Hafif koyuluk */
+            border-radius: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            padding: 2rem !important;
+        }
+        h3, h6 {
+            color: #fff;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            box-shadow: var(--shadow-strong);
+            color: var(--text-light);
+            overflow: hidden;
+        }
+        .table {
+            color: var(--text-light);
+        }
+        .table thead th {
+            white-space: nowrap;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.15);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .table tbody tr {
+            transition: all 0.2s ease-in-out;
+        }
+        .table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.01);
+            box-shadow: var(--shadow-soft);
+        }
+        .table td {
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+        .form-control::placeholder, .form-select option {
+            color: rgb(47, 78, 78);
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+            color: #fff;
+        }
+        .form-label {
+            color: #fff;
+            font-weight: 500;
+        }
+        .form-text {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        .btn {
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+            z-index: -1;
+        }
+        .btn:hover::before {
+            width: 200%;
+            height: 200%;
+        }
+
+        .btn-primary {
+            background: var(--secondary-gradient);
+            border-color: transparent;
+            box-shadow: var(--shadow-soft);
+        }
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            box-shadow: var(--shadow-strong);
+            transform: translateY(-1px);
+        }
+        .btn-outline-secondary {
+            color: var(--text-light);
+            border-color: var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .btn-outline-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #fff;
+            color: #fff;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            border-color: transparent;
+            box-shadow: var(--shadow-soft);
+        }
+        .btn-success:hover {
+            filter: brightness(1.1);
+            box-shadow: var(--shadow-strong);
+            transform: translateY(-1px);
+        }
+        .btn-outline-danger {
+            color: #dc3545;
+            border-color: #dc3545;
+            background: rgba(220, 53, 69, 0.05);
+        }
+        .btn-outline-danger:hover {
+            background: #dc3545;
+            color: #fff;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .small.text-danger { color: #ffeb3b !important; /* Sarımsı renk ile hata mesajı */ }
+        .small.text-success { color: #8bc34a !important; /* Açık yeşil ile başarı mesajı */ }
+
+        .cursor { cursor: pointer; }
+
+        /* Fade-in-up animation */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-up.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Loading Button Animation */
+        .btn.btn-loading {
+            position: relative;
+            pointer-events: none;
+        }
+        .btn.btn-loading::after {
+            content: "";
+            position: absolute;
+            width: 1em;
+            height: 1em;
+            top: 50%;
+            left: 50%;
+            margin-left: -0.5em;
+            margin-top: -0.5em;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            border-right-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+        .btn.btn-loading:not(.btn-sm)::after {
+            width: 1.2em;
+            height: 1.2em;
+            margin-left: -0.6em;
+            margin-top: -0.6em;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Ripple effect on click */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+            transform: translate3d(0, 0, 0);
+        }
+        .ripple:after {
+            content: "";
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform .5s, opacity 1s;
+        }
+        .ripple:active:after {
+            transform: scale(0, 0);
+            opacity: .2;
+            transition: 0s;
+        }
+
+    </style>
+</head>
+<body>
+<div class="floating-shapes">
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/dashboard"><i class="fas fa-book-reader me-2"></i>Kütüphane Paneli</a>
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-light" onclick="logout()"><i class="fas fa-sign-out-alt me-1"></i>Çıkış</button>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <aside class="col-12 col-md-3 col-lg-2 bg-light sidebar p-3 border-end">
+            <div class="mb-4">
+                <div class="small text-muted">Kullanıcı</div>
+                <div id="currentUser" class="fw-semibold">—</div>
+            </div>
+            <ul class="nav nav-pills flex-column gap-1">
+                <li class="nav-item"><a class="nav-link active" href="#" onclick="showView('books')"><i class="fas fa-book"></i> Kitaplar</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showView('myFavoriteList')"><i class="fas fa-heart"></i> Favori Listem</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showView('myReadList')"><i class="fas fa-bookmark"></i> Okuma Listem</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showView('admin')"><i class="fas fa-user-shield"></i> Admin</a></li>
+            </ul>
+        </aside>
+
+        <main class="col-12 col-md-9 col-lg-10 p-4">
+
+            <div id="view-books" class="view fade-in-up">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="h5 mb-0"><i class="fas fa-book me-2"></i>Kitaplar</h3>
+                    <div class="d-flex gap-2">
+                        <input id="bookSearch" type="search" class="form-control form-control-sm" placeholder="Kitap veya yazar ara..." style="width: 240px;">
+                        <button class="btn btn-sm btn-outline-secondary ripple" onclick="loadBooks()"><i class="fas fa-sync-alt me-1"></i>Yenile</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Kitap</th>
+                                <th>Yazar</th>
+                                <th>Tür</th>
+                                <th>İşlem</th>
+                            </tr>
+                            </thead>
+                            <tbody id="booksTable">
+                            <!-- BACKEND: Buraya GET /books listesinin sonucunu doldurun -->
+                            <!-- Örn. her satırda "Kütüphaneme Ekle" butonuna tıklanınca POST /mylibrary/{bookId} çağırın -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-myFavoriteList" class="view d-none fade-in-up">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="h5 mb-0"><i class="fas fa-heart me-2"></i>Favori Listem</h3>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-secondary ripple" onclick="loadFavoriteList()"><i class="fas fa-sync-alt me-1"></i>Yenile</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Kitap</th>
+                                <th>Yazar</th>
+                                <th>Tür</th>
+                                <th>İşlem</th>
+                            </tr>
+                            </thead>
+                            <tbody id="myFavoriteList">
+                            <!-- BACKEND: Buraya GET /mylibrary (kullanıcıya ait) sonucunu doldurun -->
+                            <!-- Örn. her satırda Sil butonu için DELETE /mylibrary/{bookId} çağırın -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-myReadList" class="view d-none fade-in-up">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="h5 mb-0"><i class="fas fa-bookmark me-2"></i>Okuma Listem</h3>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-secondary ripple" onclick="loadReadList()"><i class="fas fa-sync-alt me-1"></i>Yenile</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Kitap</th>
+                                <th>Yazar</th>
+                                <th>Tür</th>
+                                <th>İşlem</th>
+                            </tr>
+                            </thead>
+                            <tbody id="myReadList">
+                            <!-- BACKEND: Buraya GET /mylibrary (kullanıcıya ait) sonucunu doldurun -->
+                            <!-- Örn. her satırda Sil butonu için DELETE /mylibrary/{bookId} çağırın -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div id="view-admin" class="view d-none fade-in-up">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="h5 mb-0"><i class="fas fa-user-shield me-2"></i>Admin</h3>
+                    <div class="small text-muted">Admin yetkisi gerektirir</div>
+                </div>
+
+                <!-- KITAP EKLE -->
+                <div class="card p-3 mb-4">
+                    <h6 class="mb-3"><i class="fas fa-plus-circle me-2"></i>Kitap Ekle</h6>
+                    <form class="row g-3" onsubmit="return addBook(event)">
+                        <div class="col-md-4">
+                            <label class="form-label">Kitap Adı</label>
+                            <input id="ab-title" class="form-control" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Yazar</label>
+                            <select id="ab-authorId" class="form-select" required>
+                                <option value="">— Seçiniz —</option>
+                            </select>
+                            <div class="form-text">Listede yok mu? Aşağıdan yeni yazar ekleyin ve “Yenile”ye basın.</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Tür</label>
+                            <input id="ab-genre" class="form-control" />
+                        </div>
+                        <div class="col-12 d-flex gap-2 justify-content-end">
+                            <button type="button" class="btn btn-outline-secondary btn-sm ripple" onclick="loadAuthors()"><i class="fas fa-sync-alt me-1"></i>Yazarları Yenile</button>
+                            <button type="submit" class="btn btn-primary ripple"><i class="fas fa-plus me-1"></i>Kitap Ekle</button>
+                        </div>
+                    </form>
+                    <div id="ab-result" class="mt-2 small"></div>
+                </div>
+
+
+
+
+
+                <!-- YAZAR YÖNETİMİ -->
+                <div class="card p-3 mt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0"><i class="fas fa-users me-2"></i>Yazar Yönetimi</h6>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-secondary ripple" onclick="loadAuthors()"><i class="fas fa-sync-alt me-1"></i>Yenile</button>
+                        </div>
+                    </div>
+
+                    <form class="row g-3" onsubmit="return addAuthor(event)">
+                        <div class="col-md-4">
+                            <label class="form-label">Ad</label>
+                            <input id="au-firstName" class="form-control" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Soyad</label>
+                            <input id="au-lastName" class="form-control" required />
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-success w-100 ripple"><i class="fas fa-user-plus me-1"></i>Yeni Yazar Ekle</button>
+                        </div>
+                    </form>
+                    <div id="au-result" class="mt-2 small"></div>
+
+                    <div class="table-responsive mt-3">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Ad</th>
+                                <th>Soyad</th>
+                                <th>İşlem</th>
+                            </tr>
+                            </thead>
+                            <tbody id="authorsTable">
+                            <!-- GET /authors ile dolacak -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- User Yönetimi -->
+                <div class="card p-3 mt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0"><i class="fas fa-users-cog me-2"></i>User Yönetimi</h6>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-secondary ripple" onclick="loadUser()"><i class="fas fa-sync-alt me-1"></i>Yenile</button>
+                        </div>
+                    </div>
+
+                    <form class="row g-3" onsubmit="return addUser(event)">
+                        <div class="col-md-4">
+                            <label class="form-label">username</label>
+                            <input id="user-username" class="form-control" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">password</label>
+                            <input id="user-password" class="form-control" required />
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-success w-100 ripple"><i class="fas fa-user-plus me-1"></i>Yeni User Ekle</button>
+                        </div>
+                    </form>
+                    <div id="user-result" class="mt-2 small"></div>
+
+                    <div class="table-responsive mt-3">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Username</th>
+                                <th>İşlem</th>
+                            </tr>
+                            </thead>
+                            <tbody id="usersTable">
+                            <!-- GET /users ile dolacak -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let currentUserId = null;
+
+    function token() { return localStorage.getItem('jwt'); }
+    function authHeaders() {
+        const t = token();
+        return t ? { 'Authorization': 'Bearer ' + t } : {};
+    }
+    function logout() { localStorage.removeItem('jwt'); window.location.href = '/login'; }
+    function showView(name) {
+        document.querySelectorAll('.view').forEach(v => {
+            v.classList.add('d-none');
+            v.classList.remove('is-visible'); // Reset animation state
+        });
+        const activeView = document.getElementById('view-' + name);
+        activeView.classList.remove('d-none');
+        void activeView.offsetWidth;
+        activeView.classList.add('is-visible');
+
+        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+        const map = { books:0, myFavoriteList:1, myReadList:2 , admin:3 };
+        document.querySelectorAll('.nav-link')[map[name]].classList.add('active');
+
+        if (name === 'myFavoriteList') {
+            loadFavoriteList();
+        }
+        if (name === 'myReadList') {
+            loadReadList();
+        }
+        if (name === 'admin') {
+            loadAuthors();
+            loadUser();
+        }
+    }
+
+
+    // BACKEND: Bu fonksiyon, mevcut kullanıcı adını elde etmek için korumalı bir uçtan alınabilir.
+    // Örn. GET /me → { username, roles }
+    async function loadCurrentUser() {
+        const el = document.getElementById('currentUser');
+        el.textContent = 'yükleniyor...';
+        try {
+            const res = await fetch('/auth/me', { headers: authHeaders() });
+
+            if (!res.ok) {
+                throw new Error('Oturum doğrulanamadı. Lütfen tekrar giriş yapın.');
+            }
+
+            const me = await res.json();
+
+            currentUserId = me.id;
+
+            el.textContent = me.username;
+
+            return me;
+
+        } catch (e) {
+            el.textContent = '—';
+            console.error(e.message);
+            logout();
+        }
+    }
+
+    // BACKEND: Tüm kitapları getirir. Örn. GET /books?search=...
+    async function loadBooks() {
+        const q = document.getElementById('bookSearch').value.trim();
+        const tbody = document.getElementById('booksTable');
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-3">yükleniyor...</td></tr>';
+        try {
+            const res = await fetch('/books' + (q ? ('?search=' + encodeURIComponent(q)) : ''), { headers: authHeaders() });
+            const items = await res.json();
+            console.log('API\'den gelen kitaplar:', items);
+
+            const booksWithAuthors = await Promise.all(
+                items.map(async (book) => {
+                    const authorName = await loadAuthorsById(book);
+                    return { ...book, authorName };
+                })
+            );
+
+            tbody.innerHTML = booksWithAuthors.map((b,i) => {
+                return `
+                    <tr>
+                      <td>${i+1}</td>
+                      <td>${b.title}</td>
+                      <td>${b.authorName}</td>
+                      <td>${b.description || ''}</td>
+                      <td>
+                        <button class="btn btn-sm btn-outline-secondary ripple admin-role-button" onclick="location.href='/auth/edit?type=book&id=${b.id}'" style='background-color: #c1ccd6'><i class="fas fa-edit me-1"></i>Düzenle</button>
+                        <button class="btn btn-sm btn-primary ripple" onclick="addToFavoriteList(${b.id})"><i class="fas fa-heart me-1"></i>Favoriye Ekle</button>
+                        <button class="btn btn-sm btn-primary ripple" onclick="addToReadList(${b.id})"><i class="fas fa-bookmark me-1"></i>Okuma Listesine Ekle</button>
+                        <button class="btn btn-sm btn-outline-danger ripple admin-role-button" onclick="deleteBook(${b.id})"><i class="fas fa-trash-alt me-1"></i>Sil</button>
+                      </td>
+                    </tr>`;
+            }).join(''); } catch (e) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-danger">Bir hata oluştu</td></tr>';
+        }
+
+
+    }
+
+    // BACKEND: POST /mylibrary/{bookId}
+    async function addToFavoriteList(bookId) {
+        // currentUserId'nin dolu olup olmadığını kontrol et.
+        if (!currentUserId) {
+            alert('Kullanıcı bilgisi yüklenemedi. Lütfen sayfayı yenileyin.');
+            return;
+        }
+
+        const body = {
+            userId: currentUserId,
+            bookId: bookId
+        };
+
+        try {
+            // FAVORİ LİSTE CONTROLLER'INIZIN ENDPOINT'İ
+            const res = await fetch('/favorite-list', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...authHeaders()
+                },
+                body: JSON.stringify(body)
+            });
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(errorText || 'Kitap favorilere eklenemedi.');
+            }
+
+            alert('Kitap favorilere eklendi!');
+
+        } catch (e) {
+            alert('Hata: ' + e.message);
+        }
+    }
+
+    async function loadFavoriteList() {
+
+
+        const tbody = document.getElementById('myFavoriteList');
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-3">yükleniyor....</td></tr>';
+        try {
+            const res = await fetch('/favorite-list/' + currentUserId , { headers: authHeaders() });
+            const favoriteListData = await res.json();
+            const items = favoriteListData.books;
+            console.log("altta sorun var")
+            const booksWithAuthors = await Promise.all(
+                items.map(async (book) => {
+                    const authorName = await loadAuthorsById(book);
+                    return { ...book, authorName };
+                })
+            );
+            tbody.innerHTML = booksWithAuthors.map((b,i) => `
+        <tr>
+          <td>${i+1}</td>
+          <td>${b.title}</td>
+          <td>${b.authorName}</td>
+          <td>${b.description || ''}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-danger" onclick="removeFromFavoriteList(${b.id})">Sil</button>
+          </td>
+        </tr>`).join('');
+        } catch (e) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-danger">Bir hata oluştu</td></tr>';
+        }
+    }
+
+    async function removeFromFavoriteList(bookId) {
+        try {
+             const res = await fetch('/favorite-list/' + currentUserId + '/' + bookId, { method:'DELETE', headers: authHeaders() });
+             if (!res.ok) throw new Error(await res.text());
+            alert('Kitap silindi.');
+            loadFavoriteList();
+        } catch (e) { alert('Hata: ' + (e.message || '')); }
+    }
+
+
+    async function addBook(event) {
+        event.preventDefault();
+        const result = document.getElementById('ab-result');
+        result.textContent = '';
+
+        const selVal = document.getElementById('ab-authorId').value;
+        const body = {
+            title: document.getElementById('ab-title').value.trim(),
+            authorId: selVal ? Number(selVal) : null,
+            description: document.getElementById('ab-genre').value.trim(),
+        };
+
+        if (!body.title || !body.authorId) {
+            result.className = 'mt-2 small text-danger';
+            console.log(body.authorId)
+            result.textContent = 'Kitap adı ve yazar seçimi zorunludur.';
+            return false;
+        }
+
+        try {
+            const res = await fetch('/books', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                body: JSON.stringify(body)
+            });
+            if (!res.ok) throw new Error(await res.text());
+
+            result.className = 'mt-2 small text-success';
+            result.textContent = 'Kitap eklendi.';
+            (document.querySelector('#view-admin form'))?.reset();
+            loadBooks();
+        } catch (e) {
+            result.className = 'mt-2 small text-danger';
+            result.textContent = 'Hata: ' + (e.message || '');
+        }
+        return false;
+    }
+
+
+    async function loadAuthors() {
+        const tbody = document.getElementById('authorsTable');
+        if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="text-center py-3">yükleniyor...</td></tr>';
+
+        const sel = document.getElementById('ab-authorId');
+        if (sel) {
+            sel.innerHTML = '<option value="">— Seçiniz —</option>';
+        }
+
+        try {
+            const res = await fetch('/authors', { headers: { ...authHeaders() } });
+            if (!res.ok) throw new Error(await res.text());
+            const items = await res.json();
+
+            if (tbody) {
+                tbody.innerHTML = (items || []).map((a, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${a.firstName || ''}</td>
+          <td>${a.lastName || ''}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-secondary" onclick="location.href='/auth/edit?type=author&id=${a.id}'" style='background-color: #c1ccd6'>Düzenle</button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteAuthor(${a.id})">Sil</button>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="4" class="text-center py-3">Kayıt yok</td></tr>';
+            }
+
+            if (sel) {
+                (items || []).forEach(a => {
+                    console.log("Author objesi:", a);
+                    const opt = document.createElement('option');
+                    opt.value = a.id;
+                    opt.textContent = `${a.firstName || ''} ${a.lastName || ''}`.trim();
+                    sel.appendChild(opt);
+                });
+            }
+        } catch (e) {
+            if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="text-danger">Hata: ${e.message || ''}</td></tr>`;
+        }
+    }
+
+    async function loadAuthorsById(book){
+        let authorId = book.authorId;
+        console.log("BU author ıd " + authorId);
+
+
+        try {
+            const res = await fetch('/authors/' + authorId, {
+                method: 'GET',
+                headers: {...authHeaders()}
+            });
+            console.log("Bu res : " + res);
+            if (!res.ok) { // Hata kontrolü ekleyin
+                const errorText = await res.text();
+                console.log("Bu hata mesajı : " + res);
+                throw new Error(errorText || 'Yazar bilgisi getirilemedi.');
+            }
+
+            const authorData = await res.json();
+
+            console.log("BU author data: " + authorData);
+            return authorData.firstName;
+        } catch (e) {
+            alert('Hata: ' + (e.message || ''));
+            console.log("Bu res catch : " + res);
+            return 'Bilinmeyen Yazar';
+        }
+
+    }
+
+    async function deleteBook(id) {
+        if (!confirm('Bu kitabı silmek istediğinize emin misiniz?')) return;
+        try {
+            const res = await fetch('/books/' + id, {
+                method: 'DELETE',
+                headers: { ...authHeaders() }
+            });
+            if (!res.ok) throw new Error(await res.text());
+            await loadBooks();
+        } catch (e) {
+            alert('Hata: ' + (e.message || ''));
+        }
+
+    }
+
+
+    async function addAuthor(event) {
+        event.preventDefault();
+        const result = document.getElementById('au-result');
+        result.textContent = '';
+
+        const body = {
+            firstName: document.getElementById('au-firstName').value.trim(),
+            lastName:  document.getElementById('au-lastName').value.trim()
+        };
+        if (!body.firstName || !body.lastName) {
+            result.className = 'mt-2 small text-danger';
+            result.textContent = 'Ad ve soyad gerekli.';
+            return false;
+        }
+
+        try {
+            const res = await fetch('/authors', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                body: JSON.stringify(body)
+            });
+            if (!res.ok) throw new Error(await res.text());
+
+            result.className = 'mt-2 small text-success';
+            result.textContent = 'Yazar eklendi.';
+            document.getElementById('au-firstName').value = '';
+            document.getElementById('au-lastName').value  = '';
+            await loadAuthors();
+        } catch (e) {
+            result.className = 'mt-2 small text-danger';
+            result.textContent = 'Hata: ' + (e.message || '');
+        }
+        return false;
+    }
+
+
+    async function deleteAuthor(id) {
+        if (!confirm('Bu yazarı silmek istediğinize emin misiniz?')) return;
+        try {
+            const res = await fetch('/authors/' + id, {
+                method: 'DELETE',
+                headers: { ...authHeaders() }
+            });
+            if (!res.ok) throw new Error(await res.text());
+            await loadAuthors();
+        } catch (e) {
+            alert('Hata: ' + (e.message || ''));
+        }
+    }
+
+    async function loadUser(){
+        const tbody = document.getElementById("usersTable");
+        if(tbody) tbody.innerHTML = '<tr><td colspan="4" class="text-center py-3">yükleniyor...</td></tr>';
+
+        try{
+            const res = await fetch('/auth/users', {headers: {...authHeaders()}});
+            if(!res.ok) throw new Error(await res.text());
+            const items = await res.json();
+
+            if(tbody){
+                console.log(tbody)
+
+                tbody.innerHTML = (items || []).map((a, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${a.username || ''}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-secondary" onclick="location.href='/auth/edit?type=user&id=${a.id}'" style='background-color: #c1ccd6'>Düzenle</button>
+            <button class="btn btn-sm btn-outline-danger" onclick=deleteUser(${a.id})>Sil</button>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="4" class="text-center py-3">Kayıt yok</td></tr>';
+            }
+
+
+
+        }catch (e) {
+            if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="text-danger">Hata: ${e.message || ''}</td></tr>`;
+        }
+    }
+
+
+    async function addUser(event){
+        event.preventDefault();
+        const result = document.getElementById("user-result");
+        result.textContent = '';
+
+        const body = {
+            name: 'Default',
+            username: document.getElementById("user-username").value.trim(),
+            password: document.getElementById("user-password").value.trim(),
+            authorities: ["ROLE_USER"]
+        }
+        if(!body.username || !body.password){
+            result.className = 'mt-2 small text-danger';
+            result.textContent = 'username ve password gerekli'
+            return false
+        }
+
+        try{
+            const res = await fetch('/auth/addNewUser', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                body: JSON.stringify(body)
+            });
+            if (!res.ok) throw new Error(await res.text());
+
+            result.className = 'mt-2 small text-success';
+            result.textContent = 'User eklendi';
+            document.getElementById('user-username').value = '';
+            document.getElementById('user-password').value  = '';
+            await loadUser();
+        }catch (e) {
+            result.className = 'mt-2 small text-danger';
+            result.textContent = 'Hata: ' + (e.message || '');
+        }
+        return false;
+
+    }
+
+    async function deleteUser(id){
+        if (!confirm('Bu yazarı silmek istediğinize emin misiniz?')) return;
+        try {
+            const res = await fetch('/auth/delete/' + id, {
+                method: 'DELETE',
+                headers: { ...authHeaders() }
+            });
+            if (!res.ok) throw new Error(await res.text());
+            await loadAuthors();
+        } catch (e) {
+            alert('Hata: ' + (e.message || ''));
+        }
+    }
+
+
+    async function loadReadList() {
+
+
+        const tbody = document.getElementById('myReadList');
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-3">yükleniyor....</td></tr>';
+        try {
+            const res = await fetch('/read-list/' + currentUserId , { headers: authHeaders() });
+            const readListData = await res.json();
+            const items = readListData.books;
+
+            const booksWithAuthors = await Promise.all(
+                items.map(async (book) => {
+                    const authorName = await loadAuthorsById(book);
+                    return { ...book, authorName };
+                })
+            );
+            tbody.innerHTML = booksWithAuthors.map((b,i) => `
+        <tr>
+          <td>${i+1}</td>
+          <td>${b.title}</td>
+          <td>${b.authorName}</td>
+          <td>${b.description || ''}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-danger" onclick="removeFromReadList(${b.id})">Sil</button>
+          </td>
+        </tr>`).join('');
+        } catch (e) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-danger">Bir hata oluştu</td></tr>';
+        }
+    }
+
+
+    async function removeFromReadList(bookId) {
+        try {
+            const res = await fetch('/read-list/' + currentUserId + '/' + bookId, { method:'DELETE', headers: authHeaders() });
+            if (!res.ok) throw new Error(await res.text());
+            alert('Kitap silindi.');
+            loadReadList();
+        } catch (e) { alert('Hata: ' + (e.message || '')); }
+    }
+
+
+    async function addToReadList(bookId) {
+        if (!currentUserId) {
+            alert('Kullanıcı bilgisi yüklenemedi. Lütfen sayfayı yenileyin.');
+            return;
+        }
+
+        const body = {
+            userId: currentUserId,
+            bookId: bookId
+        };
+
+        try {
+            const res = await fetch('/read-list', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...authHeaders()
+                },
+                body: JSON.stringify(body)
+            });
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(errorText || 'Kitap okuma listesine eklenemedi.');
+            }
+
+            alert('Kitap okuma listesine eklendi!');
+
+
+        } catch (e) {
+            alert('Hata: ' + e.message);
+        }
+    }
+
+    function renderUIForRole(user) {
+        const adminPanelLink = document.querySelector("body > div.container-fluid > div > aside > ul > li:nth-child(4)");
+        const editButtons = document.querySelectorAll(".admin-role-button");
+        console.log("edit buton: "+editButtons);
+        if (user.authorities.includes("ROLE_USER")) {
+            adminPanelLink.style.display = "none";
+            editButtons.forEach((edit) => {
+                edit.style.display = "none";
+            });
+        }
+    }
+
+
+
+
+
+    async function init() {
+        if (!token()) {
+            window.location.href = '/login';
+            return;
+        }
+
+        const user = await loadCurrentUser(); // gerçek user objesi
+        console.log("Kullanıcı rolleri:", user.authorities);
+
+        await loadBooks();
+
+        if (user) {
+            renderUIForRole(user);
+        }
+        showView('books');
+    }
+
+    init();
+
+</script>
+</body>
+</html>

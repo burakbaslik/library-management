@@ -1,0 +1,710 @@
+
+
+<!doctype html>
+<html lang="tr" data-bs-theme="light">
+<head>
+    <meta charset="utf-8">
+    <title>Düzenle | Kütüphane Yönetimi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gradient: linear-gradient(135deg, #00c6fb 0%, #005bea 100%);
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --shadow-soft: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+            --shadow-strong: rgba(0, 0, 0, 0.2) 0px 8px 24px;
+            --text-light: #ffffff;
+            --text-dark: #212529;
+            --backdrop-blur: blur(10px);
+
+            /* Font sizes */
+            --h1-clamp: clamp(1.8rem, 4vw, 2.5rem);
+            --h4-clamp: clamp(1.4rem, 3vw, 1.8rem);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-gradient);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden; /* Prevent horizontal scroll from floating shapes */
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .page-max { max-width: 980px; }
+
+        /* Glassmorphism Navbar */
+        .navbar {
+            background-color: var(--glass-bg) !important;
+            backdrop-filter: var(--backdrop-blur);
+            border-bottom: 1px solid var(--glass-border) !important;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .navbar-brand {
+            font-weight: 700 !important;
+            color: var(--text-light) !important;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .navbar-text {
+            color: var(--text-light) !important;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        /* Main Content */
+        main {
+            flex-grow: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1, .h4 {
+            font-weight: 700;
+            color: var(--text-light);
+            font-size: var(--h1-clamp);
+            background: var(--secondary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .h4 {
+            font-size: var(--h4-clamp);
+        }
+
+        .badge {
+            background: var(--glass-bg) !important;
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light) !important;
+            font-weight: 500;
+            padding: 0.5em 0.8em;
+        }
+
+        /* Form Styling */
+        .form-label {
+            color: var(--text-light);
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .form-control, .form-select, .form-check-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus, .form-check-input:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(129, 125, 125, 0.5);
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+        }
+
+        .form-control::placeholder, .form-select option {
+            color: rgba(87, 85, 85, 0.7);
+        }
+        .form-select {
+            color: var(--text-light);
+        }
+
+        .form-text, .text-muted {
+            color: rgba(67, 64, 64, 0.7) !important;
+        }
+
+        .form-check-input:checked {
+            background-color: #00c6fb; /* Accent color */
+            border-color: #00c6fb;
+        }
+
+        .invalid-feedback {
+            color: #ffda00; /* Warning like yellow */
+        }
+
+        /* Buttons */
+        .btn {
+            border: none;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+        }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: var(--text-light);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .btn-outline-secondary {
+            background-color: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: var(--text-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        /* Loading Spinner */
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+            margin-right: 0.5rem;
+        }
+
+        /* Toast */
+        .toast {
+            background-color: var(--glass-bg) !important;
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--glass-border) !important;
+            color: var(--text-light) !important;
+            box-shadow: var(--shadow-strong);
+        }
+        .toast-body {
+            color: var(--text-light) !important;
+        }
+        .btn-close-white {
+            filter: invert(1); /* Makes close button white */
+        }
+
+        /* Alerts */
+        .alert {
+            background-color: var(--glass-bg);
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            box-shadow: var(--shadow-soft);
+        }
+        .alert-danger {
+            color: #ffda00 !important; /* Warning like yellow */
+            border-color: rgba(255, 255, 0, 0.5);
+        }
+        .alert-success {
+            color: #90ee90 !important; /* Light green */
+            border-color: rgba(144, 238, 144, 0.5);
+        }
+        .alert .btn-close {
+            filter: invert(1);
+        }
+
+        /* Floating Shapes */
+        .floating-shapes {
+            background: #140d0d;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .floating-shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out alternate;
+        }
+
+        .floating-shape:nth-child(1) {
+            width: 80px; height: 80px;
+            top: 10%; left: 15%;
+            animation-duration: 12s;
+        }
+        .floating-shape:nth-child(2) {
+            width: 120px; height: 120px;
+            top: 60%; left: 80%;
+            animation-duration: 18s;
+            animation-delay: 2s;
+        }
+        .floating-shape:nth-child(3) {
+            width: 60px; height: 60px;
+            top: 30%; left: 50%;
+            animation-duration: 10s;
+            animation-delay: 1s;
+        }
+        .floating-shape:nth-child(4) {
+            width: 100px; height: 100px;
+            top: 80%; left: 20%;
+            animation-duration: 16s;
+            animation-delay: 3s;
+        }
+        .floating-shape:nth-child(5) {
+            width: 70px; height: 70px;
+            top: 20%; right: 10%;
+            animation-duration: 14s;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 0.05; }
+            50% { transform: translate(20px, 30px) rotate(180deg); opacity: 0.1; }
+            100% { transform: translate(0, 0) rotate(360deg); opacity: 0.05; }
+        }
+
+        /* Fade-in-up for content */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Ripple effect for buttons */
+        .btn::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, #daffe0 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform 0.6s, opacity 0.8s;
+        }
+
+        .btn:not([disabled]):active::after {
+            transform: scale(0, 0);
+            opacity: 0.3;
+            transition: 0s;
+        }
+
+        /* Specific styles for form elements within glassmorphism */
+        .form-control, .form-select, .form-check-input {
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+        }
+        textarea.form-control {
+            min-height: 100px;
+        }
+        .form-check-label {
+            color: var(--text-light);
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+<div class="floating-shapes">
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+</div>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom sticky-top fade-in-up">
+    <div class="container">
+        <a class="navbar-brand" href="/"><i class="fas fa-book-open"></i> Kütüphane</a>
+        <span class="navbar-text" id="entityTitle">Düzenle</span>
+    </div>
+</nav>
+
+<main class="container page-max py-4">
+    <div id="alertBox" class="fade-in-up"></div>
+
+    <div class="d-flex align-items-center gap-2 mb-3 fade-in-up">
+        <h1 class="h4 mb-0" id="pageHeading">Kaydı Düzenle</h1>
+        <span class="badge text-bg-secondary" id="badgeType">—</span>
+        <span class="ms-auto small text-muted" id="recordIdLabel"></span>
+    </div>
+
+    <!-- Dinamik form burada render edilecek -->
+    <form id="editForm" class="needs-validation fade-in-up" novalidate>
+        <div id="formFields" class="row g-3"></div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button id="saveBtn" type="submit" class="btn btn-primary">
+                <span class="spinner-border spinner-border-sm d-none" id="saveSpinner" role="status" aria-hidden="true"></span>
+                <span>Kaydet</span>
+            </button>
+            <a href="javascript:history.back()" class="btn btn-outline-secondary">İptal</a>
+        </div>
+    </form>
+</main>
+
+<!-- Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080">
+    <div id="toast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMsg">Güncellendi.</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Kapat"></button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    /** === Projendeki auth header yardımcıları ===
+     * Projende zaten `authHeaders()` varsa bunu kaldırabilirsin.
+     */
+    function authHeaders(extra = {}) {
+        const token = localStorage.getItem('jwt'); // projenin kullandığı anahtar neyse onu yaz
+        return {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
+            ...extra
+        };
+    }
+
+    /** === URL Parametreleri === */
+    const params = new URLSearchParams(location.search);
+    const type = (params.get('type') || '').toLowerCase(); // 'user' | 'author' | 'book'
+    const id = params.get('id');
+
+    /** === Backend uçları (gerekirse düzenle) === */
+    const API = {
+        user:   { base: '/auth/edit',   get: (id)=>`/auth/users/${id}`,   put: (id)=>`users/edit/${id}` },
+        author: { base: '/authors', get: (id)=>`/authors/${id}`, put: (id)=>`/authors/${id}` },
+        book:   { base: '/books',   get: (id)=>`/books/${id}`,   put: (id)=>`/books/${id}` },
+        roles:  { list: '/roles' },
+        authors:{ list: '/authors' }
+    };
+
+    /** === Entity başlıkları ve alan şemaları ===
+     * Not: Backend DTO'larına göre alanları kolayca düzenleyebilirsin.
+     */
+    const SCHEMAS = {
+        user: {
+            title: "Kullanıcıyı Düzenle",
+            fields: [
+                { key:'username', label:'Kullanıcı Adı', type:'text', required:true },
+                { key:'password',    label:'Sifre',       type:'password', required:false }, /* Password can be optional for edit */
+                // Rolleri iki ihtimale göre göster: /roles varsa select, yoksa text-input
+                { key:'role',     label:'Rol',           type:'select-role-or-text' },
+                { key:'enabled',  label:'Aktif',         type:'checkbox' },
+            ]
+        },
+        author: {
+            title: "Yazarı Düzenle",
+            fields: [
+                { key:'firstName', label:'Ad',       type:'text', required:true },
+                { key:'lastName',  label:'Soyad',    type:'text', required:true },
+                { key:'bio',       label:'Biyografi',type:'textarea' }
+            ]
+        },
+        book: {
+            title: "Kitabı Düzenle",
+            fields: [
+                { key:'title',       label:'Başlık',      type:'text', required:true },
+                { key:'description', label:'Açıklama/Tür',type:'textarea' },
+                // Author select: backend'e göre authorId gönderilecek
+                { key:'authorId',    label:'Yazar',       type:'select-author', required:true }
+            ]
+        }
+    };
+
+    /** === Yardımcı UI === */
+    const alertBox = document.getElementById('alertBox');
+    function showAlert(msg, variant='danger') {
+        alertBox.innerHTML = `
+    <div class="alert alert-${variant} alert-dismissible fade show" role="alert">
+      ${msg}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+    </div>`;
+    }
+    function showToast(message='Güncelleme başarılı.') {
+        document.getElementById('toastMsg').textContent = message;
+        const t = bootstrap.Toast.getOrCreateInstance(document.getElementById('toast'));
+        t.show();
+    }
+
+    function setLoading(btnId, spinnerId, isLoading) {
+        const btn = document.getElementById(btnId);
+        const spn = document.getElementById(spinnerId);
+        if (isLoading) {
+            btn.setAttribute('disabled','disabled');
+            spn.classList.remove('d-none');
+        } else {
+            btn.removeAttribute('disabled');
+            spn.classList.add('d-none');
+        }
+    }
+
+    /** === Form oluşturma === */
+    const form = document.getElementById('editForm');
+    const formFields = document.getElementById('formFields');
+
+    function makeInput({key, label, type='text', required=false}, value, extras={}) {
+        const idAttr = 'field_' + key;
+        const colDiv = document.createElement('div');
+        colDiv.className = 'col-12';
+        let inner = '';
+
+        const requiredClass = required ? 'required' : '';
+        const reqAttr = required ? 'required' : '';
+
+        if (type === 'textarea') {
+            inner = `
+      <label for="${idAttr}" class="form-label ${requiredClass}">${label}</label>
+      <textarea class="form-control" id="${idAttr}" name="${key}" rows="3" ${reqAttr}>${value ?? ''}</textarea>
+      <div class="invalid-feedback">Lütfen ${label.toLowerCase()} girin.</div>`;
+        } else if (type === 'checkbox') {
+            inner = `
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="${idAttr}" name="${key}" ${value ? 'checked':''}>
+        <label class="form-check-label" for="${idAttr}">${label}</label>
+      </div>`;
+        } else if (type === 'select-author') {
+            inner = `
+      <label for="${idAttr}" class="form-label ${requiredClass}">${label}</label>
+      <select class="form-select" id="${idAttr}" name="${key}" ${reqAttr}>
+        <option value="">Seçiniz…</option>
+      </select>
+      <div class="invalid-feedback">Lütfen bir yazar seçin.</div>`;
+        } else if (type === 'select-role-or-text') {
+            // İlk etapta text-input; eğer /roles listesi gelirse JS ile select'e dönüştüreceğiz
+            inner = `
+      <label for="${idAttr}" class="form-label">${label}</label>
+      <input type="text" class="form-control" id="${idAttr}" name="${key}" value="${value ?? ''}">
+      <div class="form-text">Roller uç noktası varsa otomatik açılır listeye dönüşür.</div>`;
+        } else {
+            inner = `
+      <label for="${idAttr}" class="form-label ${requiredClass}">${label}</label>
+      <input type="${type}" class="form-control" id="${idAttr}" name="${key}" value="${value ?? ''}" ${reqAttr}>
+      <div class="invalid-feedback">Lütfen ${label.toLowerCase()} girin.</div>`;
+        }
+
+        colDiv.innerHTML = inner;
+        return colDiv;
+    }
+
+    /** === Veri çekme & Formu doldurma === */
+    async function fetchJson(url) {
+        const res = await fetch(url, { headers: authHeaders() });
+        if (!res.ok) {
+            const txt = await res.text().catch(()=>res.statusText);
+            throw new Error(`HTTP ${res.status}: ${txt}`);
+        }
+        return res.json();
+    }
+
+    async function buildForm(entityType, entityId) {
+        const schema = SCHEMAS[entityType];
+        if (!schema) throw new Error('Geçersiz type parametresi. Beklenen: user | author | book');
+
+        // Başlıklar
+        document.getElementById('entityTitle').textContent = schema.title;
+        document.getElementById('pageHeading').textContent = schema.title;
+        document.getElementById('badgeType').textContent = entityType.toUpperCase();
+        document.getElementById('recordIdLabel').textContent = `ID: ${entityId}`;
+
+        // Kayıt getir
+        const data = await fetchJson(API[entityType].get(entityId));
+
+        // Özel alan hazırlıkları
+        // book.authorId: backend bazen author string/obj dönebiliyor; normalize et
+        if (entityType === 'book') {
+            if (data.authorId == null) {
+                if (typeof data.author === 'number') data.authorId = data.author;
+                else if (typeof data.author === 'string') data.authorId = null;
+                else if (data.author && (data.author.id != null)) data.authorId = data.author.id;
+            }
+        }
+
+        // user.role string / roles[0].roleName gibi varyantlar olabilir
+        if (entityType === 'user') {
+            if (!data.role) {
+                if (Array.isArray(data.roles) && data.roles.length) {
+                    data.role = (data.roles[0].roleName || data.roles[0].name || data.roles[0]);
+                }
+            }
+            if (typeof data.enabled !== 'boolean' && data.enabled != null) {
+                data.enabled = String(data.enabled) === 'true';
+            }
+        }
+
+        // Form alanlarını oluştur
+        formFields.innerHTML = '';
+        for (const f of schema.fields) {
+            const val = data[f.key];
+            formFields.appendChild(makeInput(f, val));
+        }
+
+        // Yazar listesini doldur
+        if (entityType === 'book') {
+            try {
+                const authors = await fetchJson(API.authors.list);
+                const select = document.getElementById('field_authorId');
+                authors.forEach(a => {
+                    const opt = document.createElement('option');
+                    opt.value = a.id;
+                    const full = [a.firstName || '', a.lastName || ''].join(' ').trim() || (a.name || `#${a.id}`);
+                    opt.textContent = full;
+                    select.appendChild(opt);
+                });
+                if (data.authorId != null) select.value = String(data.authorId);
+            } catch (e) {
+                console.warn('Yazar listesi alınamadı:', e.message);
+            }
+        }
+
+        // Rol listesini doldur (varsa)
+        if (entityType === 'user') {
+            try {
+                const roles = await fetchJson(API.roles.list); // [{id, roleName}] veya ["ROLE_USER", ...]
+                const field = document.getElementById('field_role');
+                // input'u select'e dönüştür
+                const wrapper = field.parentElement;
+                const select = document.createElement('select');
+                select.className = 'form-select';
+                select.id = 'field_role';
+                select.name = 'role';
+                const currentVal = field.value;
+                wrapper.replaceChild(select, field);
+
+                const opt0 = document.createElement('option');
+                opt0.value = '';
+                opt0.textContent = 'Seçiniz…';
+                select.appendChild(opt0);
+
+                roles.forEach(r => {
+                    const value = r.roleName || r.name || r; // farklı DTO olasılıkları
+                    const opt = document.createElement('option');
+                    opt.value = value;
+                    opt.textContent = value;
+                    select.appendChild(opt);
+                });
+                if (currentVal) select.value = currentVal;
+            } catch (e) {
+                console.info('Roles endpoint yok veya erişilemedi, text input olarak devam:', e.message);
+            }
+        }
+
+        // Native validation için
+        form.classList.add('was-validated');
+    }
+
+    /** === Kaydet (PUT) === */
+    form.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            showAlert('Lütfen zorunlu alanları doldurun.');
+            return;
+        }
+
+        setLoading('saveBtn', 'saveSpinner', true);
+        try {
+            const payload = collectPayload(type);
+            // console.debug('Giden payload:', payload);
+
+            const res = await fetch(API[type].put(id), {
+                method: 'PUT',
+                headers: authHeaders(),
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) {
+                const text = await res.text().catch(()=>res.statusText);
+                throw new Error(`HTTP ${res.status} — ${text}`);
+            }
+            showToast('Kayıt başarıyla güncellendi.');
+            alertBox.innerHTML = '';
+        } catch (e) {
+            showAlert('Güncelleme başarısız: ' + (e.message || e));
+        } finally {
+            setLoading('saveBtn', 'saveSpinner', false);
+        }
+    });
+
+    function collectPayload(entityType) {
+        const fd = new FormData(form);
+        const obj = {};
+        for (const [k,v] of fd.entries()) obj[k] = v;
+
+        if (entityType === 'user') {
+            obj.enabled = document.getElementById('field_enabled')?.checked ?? false;
+            if (obj.role) {
+                obj.authorities = [obj.role]; // obj.role değerini bir dizi içine koy
+                delete obj.role; // Artık gereksiz olan eski "role" alanını sil
+            } else {
+                obj.authorities = []; // Rol seçilmemişse boş dizi gönder
+            }
+            // Arka uç nasıl bekliyorsa ona göre uyarlama:
+            // Örn: rolü "roles":[{"roleName": "..."}] olarak istiyorsan:
+            // obj.roles = [{ roleName: obj.role }];
+        }
+        if (entityType === 'book') {
+            obj.authorId = obj.authorId ? Number(obj.authorId) : null;
+        }
+        // Eğer password alanı boşsa payload'dan kaldır (güncelleme yapma)
+        if (entityType === 'user' && obj.password === '') {
+            delete obj.password;
+        }
+        return obj;
+    }
+
+    /** === Sayfayı başlat === */
+    (async function init() {
+        // Intersection Observer for fade-in-up animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                } else {
+                    entry.target.classList.remove('visible'); // Optional: fade out when scrolled away
+                }
+            });
+        }, { threshold: 0.1 }); // Trigger when 10% of the item is visible
+
+        document.querySelectorAll('.fade-in-up').forEach(element => {
+            observer.observe(element);
+        });
+
+        if (!type || !['user','author','book'].includes(type) || !id) {
+            showAlert('Geçersiz bağlantı. Örnek: <code>edit.html?type=book&id=1</code>');
+            form.classList.add('d-none');
+            return;
+        }
+        try {
+            await buildForm(type, id);
+        } catch (e) {
+            showAlert('Kayıt yüklenemedi: ' + (e.message || e));
+            form.classList.add('d-none');
+        }
+    })();
+</script>
+</body>
+</html>
